@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Premium Game Palette */
+  --color-game-bg-dark: #0f172a;
+  --color-game-bg-gradient-start: #1e1b4b;
+  --color-game-bg-gradient-end: #312e81;
+  
+  --color-game-p1: #ff3e3e; /* Non-standard Vibrant Red */
+  --color-game-p2: #3b82f6; /* Vibrant Blue */
+  --color-game-accent: #00d4ff; /* Cyan accent */
+  
+  --color-game-glass: rgba(255, 255, 255, 0.05);
+  --color-game-glass-border: rgba(255, 255, 255, 0.1);
+  --color-game-text-main: #f8fafc;
+  --color-game-text-muted: #94a3b8;
+  
+  --shadow-neon-p1: 0 0 10px rgba(255, 62, 62, 0.5), 0 0 20px rgba(255, 62, 62, 0.3);
+  --shadow-neon-p2: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-game-glass backdrop-blur-md border border-game-glass-border shadow-glass rounded-2xl;
+  }
+}
+
+body {
+  @apply font-sans bg-game-bg-dark text-game-text-main min-h-screen overflow-x-hidden;
+  background: radial-gradient(circle at top left, var(--color-game-bg-gradient-start), var(--color-game-bg-dark) 80%);
+}
+
+/* Custom classes for pieces */
+/* Custom classes for pieces */
+.piece { 
+    @apply w-12 h-12 md:w-16 md:h-16 flex justify-center items-center text-xl text-white font-black relative z-10 transition-all duration-300 backdrop-blur-[1px];
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.piece-1 { 
+    background: rgba(255, 255, 255, 0.01); 
+    /* Point Up Logic: Pentagon */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 90%, 0% 90%, 0% 25%);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+.piece-2 { 
+    background: rgba(255, 255, 255, 0.01);
+    /* Point Down Logic: Pentagon */
+    clip-path: polygon(0% 10%, 100% 10%, 100% 75%, 50% 100%, 0% 75%);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Tile Styles (Physically grounded look) */
+.tile-base {
+    @apply relative w-16 h-16 md:w-20 md:h-20 rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tile-white {
+    background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.8),
+        0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tile-black {
+    background: linear-gradient(to bottom right, #334155, #0f172a);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 2px 5px rgba(0,0,0,0.3);
+}
+
+.tile-gray {
+    background: linear-gradient(to bottom right, #94a3b8, #64748b);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        0 2px 5px rgba(0,0,0,0.2);
+}
+
+.tile-icon {
+    @apply absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 opacity-80 pointer-events-none;
+}
+
+.cell-anim-enter {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}

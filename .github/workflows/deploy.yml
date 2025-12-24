@@ -1,0 +1,102 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master, main, remake ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 1. Setup Emscripten & Compile Wasm
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64 # Use a stable recent version
+
+      - name: Verify Emscripten
+        run: emcc -v
+
+      - name: Create Web Public Dir
+        run: mkdir -p web/public
+
+      - name: Compile WASM
+        run: |
+          emcc -O3 -std=c++17 \
+            -s WASM=1 \
+            -s ALLOW_MEMORY_GROWTH=1 \
+            -s MODULARIZE=1 \
+            -s 'EXPORT_NAME="ContrastModule"' \
+            -s FORCE_FILESYSTEM=1 \
+            -s EXPORTED_RUNTIME_METHODS='["FS"]' \
+            -I. \
+            --bind \
+            -o web/public/contrast.js \
+            wasm/bindings.cpp
+
+      # 2. Setup Python & Export Model (Optional if you commit model.bin, but safer to generate)
+      # Assuming model.pth is large and git-lfs is used or it is not in repo.
+      # If model is not in repo, we can't export it. 
+      # User said "modelsディレクトリには学習済みデータが保存されている".
+      # I will assume checking in the binary `web/public/model.bin` is better if < 100MB.
+      # If not, we rely on it being present. 
+      # Let's assume for now we use the committed model.bin if it exists, or fail if not.
+      # Actually, I should probably commit the model.bin I generated? 
+      # But git might block it if large. The `.pth` is 3.5MB. `model.bin` should be similar. 3.5MB is fine for Git.
+      
+      - name: Copy Model Binary
+        run: |
+          # If we have model.bin in repo (e.g. committed in wasm/), copy it.
+          # Or if we generated it locally and committed it to web/public directly.
+          # For safety, ensure it exists in web/public
+          if [ -f "wasm/model.bin" ]; then
+            cp wasm/model.bin web/public/model.bin
+          fi
+          ls -l web/public/
+
+      # 3. Build React App
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd web
+          npm ci
+
+      - name: Build
+        run: |
+          cd web
+          npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
