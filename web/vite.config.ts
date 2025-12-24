@@ -5,5 +5,5 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(),tailwindcss(),],
-  base: '/contrast_alphazero/', // GitHub Pages repo name
+  base: '/contrast_web/', // GitHub Pages repo name
 })
