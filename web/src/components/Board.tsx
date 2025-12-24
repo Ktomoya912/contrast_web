@@ -196,7 +196,6 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                                 <Piece 
                                     player={humanPlayer} 
                                     className="opacity-50 absolute inset-0 m-auto" 
-                                    isGhost={true} 
                                 />
                             )}
 

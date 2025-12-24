@@ -3,10 +3,9 @@ import React from 'react';
 interface PieceProps {
     player: number;  // 1 or 2
     className?: string; // For additional styling/positioning
-    isGhost?: boolean; // If true, rendering as a ghost piece (lighter opacity handled by parent mostly, but good for context)
 }
 
-const Piece: React.FC<PieceProps> = ({ player, className = "", isGhost = false }) => {
+const Piece: React.FC<PieceProps> = ({ player, className = "" }) => {
     
     // Internal helper for static arrows
     const getPieceArrows = () => (

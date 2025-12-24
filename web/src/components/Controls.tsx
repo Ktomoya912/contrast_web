@@ -28,8 +28,6 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
     // Normalize to 0-100% (0.5 =even)
     // Value range likely -1 to 1.
     const percentage = Math.max(0, Math.min(100, (displayValue + 1) * 50));
-    const isAdvantage = displayValue > 0.05;
-    const isDisadvantage = displayValue < -0.05;
 
     const handleSimChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseInt(e.target.value);
