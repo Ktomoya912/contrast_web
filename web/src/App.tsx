@@ -44,7 +44,7 @@ function AppContent() {
 
   return (
 
-     <div className="min-h-[100dvh] flex flex-col relative bg-game-bg-dark w-full px-4 pt-8 md:pt-12 text-center pb-0">
+     <div className="min-h-[100dvh] flex flex-col relative bg-game-bg-dark w-full px-4 pt-8 md:pt-12 text-center pb-0 overflow-hidden">
 
        {/* ... */}
        
@@ -81,10 +81,11 @@ function AppContent() {
         {/* Mobile Fixed Bottom: Eval + Undo */}
         <div className="md:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-900/95 backdrop-blur border-t border-white/10 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] flex flex-col gap-3">
             <div className="flex justify-between items-center w-full">
-                <div className="flex-1 mr-4">
+                <div className="flex-1 mr-4 min-w-0">
                      <EvaluationBar 
                              aiValue={aiValue}
                              humanPlayer={humanPlayer}
+                             className="w-full"
                      />
                 </div>
                 <button 
@@ -118,14 +119,14 @@ function AppContent() {
        </header>
        
        {!isReady && !error && (
-           <div className="mb-4 flex items-center gap-3 glass-panel px-4 py-2 text-cyan-400 animate-pulse text-sm md:text-base">
+           <div className="mb-4 flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl px-4 py-2 text-cyan-400 animate-pulse text-sm md:text-base">
              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
              {t.app.loading}
            </div>
        )}
        
        {error && (
-           <div className="mb-8 glass-panel px-6 py-4 border-red-500/50 text-red-400 font-bold flex flex-col items-center">
+           <div className="mb-8 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl px-6 py-4 border-red-500/50 text-red-400 font-bold flex flex-col items-center">
              <span className="text-2xl mb-2">⚠️</span>
              {error}
            </div>
@@ -158,7 +159,7 @@ function AppContent() {
              </div>
              
              {/* Mobile Bottom Controls (Settings/Reset only) */}
-             <div className="md:hidden w-full mt-4 glass-panel p-4">
+             <div className="md:hidden w-full mt-4 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl p-4">
                  <h3 className="text-white font-bold mb-3 text-sm border-b border-white/10 pb-2">{t.app.settings}</h3>
                  <div className="flex flex-col gap-4">
                       <button 

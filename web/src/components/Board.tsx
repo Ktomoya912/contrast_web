@@ -16,6 +16,15 @@ interface PendingMove {
     to: number;
 }
 
+// Style Constants
+const GLASS_PANEL = "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl";
+
+const TILE_BASE = "relative w-12 h-12 md:w-20 md:h-20 rounded-lg md:rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)]";
+
+const TILE_WHITE = "bg-gradient-to-br from-slate-50 to-slate-200 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_5px_rgba(0,0,0,0.1)]";
+const TILE_BLACK = "bg-gradient-to-br from-slate-700 to-slate-900 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_5px_rgba(0,0,0,0.3)]";
+const TILE_GRAY = "bg-gradient-to-br from-slate-400 to-slate-600 border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.2)]";
+
 const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidMoves }) => {
     const { t } = useLanguage();
     const { pieces, tiles, current_player, game_over, tile_counts } = gameState;
@@ -99,18 +108,18 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
     };
 
     return (
-        <div className="glass-panel p-4 md:p-6 shadow-2xl relative">
+        <div className={`${GLASS_PANEL} p-4 md:p-6 shadow-2xl relative flex flex-col items-center`}>
 
 
             {/* Tile Selection Overlay */ }
             {pendingMove && !placingTileType && (
-                <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm rounded-2xl flex flex-col justify-center items-center p-6 animate-fadeIn">
+                <div className="bg-black/60 backdrop-blur-sm rounded-2xl flex flex-col justify-center items-center p-6 animate-fadeIn">
                     <h3 className="text-xl text-white font-bold mb-6">{t.board.placeTile}</h3>
                     <div className="flex gap-4 mb-6">
                         {tile_counts[(humanPlayer-1)*2+0] > 0 && (
                             <button 
                                 onClick={() => setPlacingTileType(1)}
-                                className="flex flex-col items-center gap-2 tile-black p-4 rounded-xl transition-all hover:scale-105"
+                                className={`flex flex-col items-center gap-2 ${TILE_BLACK} p-4 rounded-xl transition-all hover:scale-105`}
                             >
                                 <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="currentColor">
                                     <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -125,7 +134,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         {tile_counts[(humanPlayer-1)*2+1] > 0 && (
                             <button 
                                 onClick={() => setPlacingTileType(2)}
-                                className="flex flex-col items-center gap-2 tile-gray p-4 rounded-xl transition-all hover:scale-105"
+                                className={`flex flex-col items-center gap-2 ${TILE_GRAY} p-4 rounded-xl transition-all hover:scale-105`}
                             >
                                 <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                                      <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" strokeLinecap="round" />
@@ -164,10 +173,10 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         !((piece !== 0 && idx !== pendingMove?.from) || idx === pendingMove?.to);
                     
                     // Base Classes
-                    let baseClasses = "tile-base group ";
-                    if (tileType === 0) baseClasses += "tile-white";
-                    else if (tileType === 1) baseClasses += "tile-black";
-                    else baseClasses += "tile-gray";
+                    let baseClasses = `${TILE_BASE} group `;
+                    if (tileType === 0) baseClasses += TILE_WHITE;
+                    else if (tileType === 1) baseClasses += TILE_BLACK;
+                    else baseClasses += TILE_GRAY;
 
                     // Selection Glow
                     if (isSelected) {
@@ -207,7 +216,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                             {piece !== 0 && !(pendingMove && idx === pendingMove.from) && (
                                 <Piece 
                                     player={piece} 
-                                    className="cell-anim-enter" 
+                                    className="[animation:fadeIn_0.3s_ease-out_forwards]" 
                                 />
                             )}
                             
@@ -233,12 +242,12 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
             </div>
             
             {/* Coordinates */}
-            <div className="absolute -left-6 top-0 bottom-0 flex flex-col justify-around text-xs text-white/20 font-mono h-full py-6">
+            {/* <div className="absolute -left-6 top-0 bottom-0 flex flex-col justify-around text-xs text-white/20 font-mono h-full py-6">
                 <span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
             </div>
             <div className="absolute -bottom-6 left-0 right-0 flex justify-around text-xs text-white/20 font-mono w-full px-6">
                 <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
-            </div>
+            </div> */}
         </div>
     );
 };

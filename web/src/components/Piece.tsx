@@ -59,12 +59,16 @@ const Piece: React.FC<PieceProps> = ({ player, className = "" }) => {
         }
     };
 
-    // Construct the full component structure
-    // We use the same .piece classes for outer shell sizing/positioning/animations
-    // But we render the SVG content inside.
-    
+    // Style Constants for inline usage
+    const PIECE_BASE = "w-10 h-10 md:w-16 md:h-16 flex justify-center items-center text-xl text-white font-black relative z-10 transition-all duration-300 backdrop-blur-[1px] [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]";
+    // Using arbitrary clip-path values for Pentagons
+    const PIECE_1 = "bg-white/[0.01] drop-shadow-md [clip-path:polygon(50%_0%,100%_25%,100%_90%,0%_90%,0%_25%)]";
+    const PIECE_2 = "bg-white/[0.01] drop-shadow-md [clip-path:polygon(0%_10%,100%_10%,100%_75%,50%_100%,0%_75%)]";
+
+    const styleClass = player === 1 ? PIECE_1 : PIECE_2;
+
     return (
-        <div className={`piece piece-${player} flex justify-center items-center ${className}`}>
+        <div className={`${PIECE_BASE} ${styleClass} ${className}`}>
             <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 {getPieceBorder(player)}
                 <g transform="scale(0.7) translate(5,5)">

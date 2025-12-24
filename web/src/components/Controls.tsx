@@ -22,7 +22,7 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
     const isMyTurn = current_player === humanPlayer;
 
     return (
-        <div className="glass-panel p-6 w-full max-w-sm">
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl p-6 w-full max-w-sm">
             {/* Status Bar */}
             <div className={`text-center py-4 rounded-xl mb-6 font-bold text-lg tracking-wide transition-colors duration-500 border ${
                 game_over 
