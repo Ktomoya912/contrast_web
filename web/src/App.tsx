@@ -1,36 +1,20 @@
 import { useEffect, useState } from 'react'
 import Board from './components/Board'
 import Controls from './components/Controls'
+import EvaluationBar from './components/EvaluationBar'
+import GameSettings from './components/GameSettings'
+import PlayerResources from './components/PlayerResources'
+import RulesModal from './components/RulesModal'
 import { useGame } from './hooks/useGame'
 import './index.css'
-
-// Types
-export type Player = 1 | 2;
-export type TileType = 0 | 1 | 2; // White, Black, Gray
-
-export interface GameState {
-  pieces: number[]; // Flat 25
-  tiles: number[]; // Flat 25
-  tile_counts: number[]; // [P1_B, P1_G, P2_B, P2_G]
-  current_player: Player;
-  game_over: boolean;
-  winner: number;
-  move_count: number;
-}
-
-export const INITIAL_STATE: GameState = {
-  pieces: Array(25).fill(0),
-  tiles: Array(25).fill(0),
-  tile_counts: [3, 1, 3, 1],
-  current_player: 1,
-  game_over: false,
-  winner: 0,
-  move_count: 0
-};
+import { type Player } from './types'
 
 function App() {
   const { gameState, aiValue, resetGame, move, undo, getValidMoves, triggerAI, isThinking, error, isReady, simulationCount, setSimulationCount } = useGame();
   const [humanPlayer, setHumanPlayer] = useState<Player>(1);
+  const [showRules, setShowRules] = useState(false);
+  
+  const opponentPlayer = humanPlayer === 1 ? 2 : 1;
 
   // Auto-trigger AI if it's AI turn
   useEffect(() => {
@@ -52,22 +36,81 @@ function App() {
       move(from, to, tile);
   };
 
+  const handleUndo = () => {
+      undo(humanPlayer);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center relative bg-game-bg-dark pb-32 pt-20 md:py-8 overflow-x-hidden">
+      {/* Mobile Fixed Top: Both Resources */}
+      <div className="md:hidden fixed top-0 left-0 w-full z-40 bg-slate-900/95 backdrop-blur border-b border-white/10 px-2 py-2 flex flex-col gap-2 shadow-xl">
+           <div className="flex justify-between items-center w-full">
+                <PlayerResources 
+                        tileCounts={gameState.tile_counts} 
+                        targetPlayer={opponentPlayer} 
+                        label="Opp" 
+                        compact={true}
+                        className="scale-90 origin-left"
+                />
+                
+                <button 
+                        onClick={() => setShowRules(true)}
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-cyan-400 font-bold shrink-0 mx-2"
+                >
+                    ?
+                </button>
+
+                <PlayerResources 
+                        tileCounts={gameState.tile_counts} 
+                        targetPlayer={humanPlayer} 
+                        label="You" 
+                        compact={true}
+                        className="scale-90 origin-right"
+                />
+           </div>
+      </div>
+
+       {/* Mobile Fixed Bottom: Eval + Undo */}
+       <div className="md:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-900/95 backdrop-blur border-t border-white/10 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] flex flex-col gap-3">
+           <div className="flex justify-between items-center w-full">
+               <div className="flex-1 mr-4">
+                    <EvaluationBar 
+                            aiValue={aiValue}
+                            humanPlayer={humanPlayer}
+                    />
+               </div>
+               <button 
+                    onClick={handleUndo}
+                    className="px-4 py-2 bg-gray-700 rounded-lg text-xs font-bold text-gray-300 border border-gray-600 active:scale-95 shrink-0"
+               >
+                   UNDO
+               </button>
+           </div>
+       </div>
+
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <header className="mb-8 md:mb-12 text-center relative z-10">
-        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 drop-shadow-sm">
+      <header className="mb-4 md:mb-8 text-center relative z-10 w-full flex flex-col items-center md:block hidden">
+        {/* Desktop Header content */}
+        <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-1 md:mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 drop-shadow-sm">
           CONTRAST
         </h1>
-        <p className="text-game-text-muted text-lg font-light tracking-widest uppercase">
+        <p className="text-game-text-muted text-xs md:text-lg font-light tracking-widest uppercase mb-4">
           Neural Architecture v1.0
         </p>
+
+        <button 
+            onClick={() => setShowRules(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm font-bold transition-all border border-white/10"
+        >
+            <span className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center text-[10px] text-black font-black">?</span>
+            How to Play
+        </button>
       </header>
       
       {!isReady && !error && (
-          <div className="mb-8 flex items-center gap-3 glass-panel px-6 py-3 text-cyan-400 animate-pulse">
+          <div className="mb-4 flex items-center gap-3 glass-panel px-4 py-2 text-cyan-400 animate-pulse text-sm md:text-base">
             <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
             Loading Neural Engine...
           </div>
@@ -80,8 +123,8 @@ function App() {
           </div>
       )}
       
-      <main className="flex flex-col lg:flex-row gap-12 items-center lg:items-start max-w-7xl w-full justify-center relative z-10">
-        <div className="order-2 lg:order-1">
+      <main className="flex flex-col lg:flex-row gap-6 md:gap-12 items-center lg:items-start max-w-7xl w-full justify-center relative z-10 p-2 md:p-0">
+        <div className="order-2 lg:order-1 touch-none"> 
             <Board 
                 gameState={gameState} 
                 humanPlayer={humanPlayer}
@@ -90,53 +133,49 @@ function App() {
             />
         </div>
         
-        <div className="order-1 lg:order-2 w-full lg:w-auto min-w-[320px]">
-            <Controls 
-                gameState={gameState}
-                aiValue={aiValue}
-                humanPlayer={humanPlayer}
-                setHumanPlayer={setHumanPlayer}
-                simulationCount={simulationCount}
-                setSimulationCount={setSimulationCount}
-                onReset={handleReset}
-                onUndo={undo}
-            />
-
-            <div className="mt-8 glass-panel p-6 max-w-sm">
-                <h2 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                    <span className="text-2xl">⚡</span> Quick Guide
-                </h2>
-                <ul className="space-y-3 text-sm text-gray-300">
-                    <li className="flex items-start gap-2">
-                        <span className="text-cyan-400 mt-1">●</span> 
-                        <span>Goal: Reach opponent's back rank.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                        <span className="text-cyan-400 mt-1">●</span> 
-                        <span>Move based on tile color:</span>
-                    </li>
-                    <div className="grid grid-cols-3 gap-2 pl-4 mt-2 mb-2">
-                         <div className="flex flex-col items-center p-2 rounded bg-white/5">
-                            <span className="text-2xl mb-1">✜</span>
-                            <span className="text-xs text-gray-400">Orthogonal</span>
-                         </div>
-                         <div className="flex flex-col items-center p-2 rounded bg-white/5">
-                            <span className="text-2xl mb-1">✖</span>
-                            <span className="text-xs text-gray-400">Diagonal</span>
-                         </div>
-                         <div className="flex flex-col items-center p-2 rounded bg-white/5">
-                            <span className="text-2xl mb-1">✳</span>
-                            <span className="text-xs text-gray-400">8-Way</span>
-                         </div>
-                    </div>
-                </ul>
+        <div className="order-1 lg:order-2 w-full lg:w-auto min-w-[300px] max-w-sm">
+            {/* Desktop Controls (Full) */}
+            <div className="hidden md:block">
+                <Controls 
+                    gameState={gameState}
+                    aiValue={aiValue}
+                    humanPlayer={humanPlayer}
+                    setHumanPlayer={setHumanPlayer}
+                    simulationCount={simulationCount}
+                    setSimulationCount={setSimulationCount}
+                    onReset={handleReset}
+                    onUndo={handleUndo}
+                />
+            </div>
+            
+            {/* Mobile Bottom Controls (Settings/Reset only) */}
+            <div className="md:hidden w-full mt-4 glass-panel p-4">
+                <h3 className="text-white font-bold mb-3 text-sm border-b border-white/10 pb-2">Game Settings</h3>
+                <div className="flex flex-col gap-4">
+                     <button 
+                        onClick={handleReset}
+                        className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg font-bold text-white text-sm shadow-lg active:scale-95 transition-all"
+                     >
+                        New Game
+                     </button>
+                     
+                     <GameSettings
+                        humanPlayer={humanPlayer}
+                        setHumanPlayer={setHumanPlayer}
+                        simulationCount={simulationCount}
+                        setSimulationCount={setSimulationCount}
+                     />
+                </div>
             </div>
         </div>
       </main>
+
       
-      <footer className="mt-16 text-center text-gray-600 text-sm relative z-10">
+      <footer className="mt-8 text-center text-gray-600 text-xs md:text-sm relative z-10 p-4">
         <p>Powered by AlphaZero &amp; WebAssembly</p>
       </footer>
+      
+      <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
     </div>
   )
 }

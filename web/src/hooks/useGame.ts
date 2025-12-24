@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { GameState, Player } from '../App';
-import { INITIAL_STATE } from '../App';
+import type { GameState, Player } from '../types';
+import { INITIAL_STATE } from '../types';
 
 // Define the Wasm module interface
 interface WasmModule {
@@ -143,11 +143,22 @@ export function useGame() {
         }
     }, [module]);
     
-    const undo = useCallback(() => {
+    const undo = useCallback((targetPlayer?: Player) => {
         if (!module) return;
-        if (module.undo()) {
+        
+        let success = module.undo();
+        if (success) {
+            // Check if we need to undo further to reach target player's turn
+            // This handles AI games where we want to revert AI move + Human move
+            const raw = module.get_state();
+            if (targetPlayer && raw.current_player !== targetPlayer) {
+                // Try undoing one more time
+                module.undo();
+            }
+            
             syncState(module);
             setError(null);
+            setAiValue(0); // Clear AI prediction on undo
         }
     }, [module]);
 

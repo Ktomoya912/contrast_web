@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { GameState, Player } from '../App';
+import type { GameState, Player } from '../types';
 import Piece from './Piece';
 
 interface BoardProps {

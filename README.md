@@ -2,7 +2,8 @@
 
 [![Deploy to GitHub Pages](https://github.com/Ktomoya912/contrast_web/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ktomoya912/contrast_web/actions/workflows/deploy.yml)
 
-5x5の盤面で、タイルの色によって移動方向が変化する戦略的な2人対戦ボードゲームです。
+5x5の盤面で、タイルの色によって移動方向が変化する戦略的な2人対戦ボードゲームです。[ここからプレイ](https://ktomoya912.github.io/contrast_web/)
+
 
 ## ゲームルール
 
