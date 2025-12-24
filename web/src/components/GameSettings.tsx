@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { Player } from '../types';
 
 interface GameSettingsProps {
@@ -10,6 +11,7 @@ interface GameSettingsProps {
 }
 
 const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer, simulationCount, setSimulationCount, className = "" }) => {
+    const { t, language, setLanguage } = useLanguage();
     
     const handleSimChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseInt(e.target.value);
@@ -20,14 +22,41 @@ const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer
 
     return (
         <div className={className}>
+             {/* Language Settings */}
+             <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/5">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Language / 言語</label>
+                <div className="flex gap-2 bg-black/30 p-1 rounded-lg">
+                    <button 
+                        onClick={() => setLanguage('ja')}
+                        className={`flex-1 py-1 rounded text-xs font-bold transition-all ${
+                            language === 'ja'
+                            ? 'bg-cyan-600 text-white shadow-md'
+                            : 'text-gray-500 hover:text-gray-300'
+                        }`}
+                    >
+                        日本語
+                    </button>
+                    <button 
+                        onClick={() => setLanguage('en')}
+                        className={`flex-1 py-1 rounded text-xs font-bold transition-all ${
+                            language === 'en'
+                            ? 'bg-cyan-600 text-white shadow-md'
+                            : 'text-gray-500 hover:text-gray-300'
+                        }`}
+                    >
+                        English
+                    </button>
+                </div>
+             </div>
+
              {/* AI Settings */}
              <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/5">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">AI Strength</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t.settings.aiStrength}</label>
                 <div className="grid grid-cols-3 gap-2 mb-3">
                     {[
-                        { label: 'Weak', val: 50 },
-                        { label: 'Normal', val: 200 },
-                        { label: 'Strong', val: 400 },
+                        { label: t.settings.weak, val: 50 },
+                        { label: t.settings.normal, val: 200 },
+                        { label: t.settings.strong, val: 400 },
                     ].map(opt => (
                         <button
                             key={opt.label}
@@ -43,7 +72,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer
                     ))}
                 </div>
                 <div className="flex items-center gap-2">
-                     <span className="text-xs text-gray-500">Custom:</span>
+                     <span className="text-xs text-gray-500">{t.settings.custom}:</span>
                      <input 
                         type="number" 
                         value={simulationCount}
@@ -56,7 +85,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer
 
             {/* Player Selection */}
             <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/5">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Select Side</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t.settings.selectSide}</label>
                 <div className="flex gap-3">
                     <button 
                         className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
@@ -66,7 +95,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer
                         }`}
                         onClick={() => setHumanPlayer(1)}
                     >
-                        FIRST (P1)
+                        {t.settings.first}
                     </button>
                     <button 
                         className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all duration-200 border-2 ${
@@ -76,7 +105,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer
                         }`}
                         onClick={() => setHumanPlayer(2)}
                     >
-                        SECOND (P2)
+                        {t.settings.second}
                     </button>
                 </div>
             </div>

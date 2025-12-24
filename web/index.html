@@ -1,5 +1,4 @@
-<!doctype html>
-<html lang="en">
+<html lang="en" class="min-h-[100dvh] bg-[radial-gradient(circle_at_top_left,#1e1b4b,#0f172a_80%)] bg-fixed">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -12,8 +11,8 @@
     <!-- Load Wasm Glue Code -->
     <script src="contrast.js"></script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="min-h-[100dvh] bg-slate-900 m-0 p-0 font-sans text-slate-50 overflow-x-hidden">
+    <div id="root" class="min-h-[100dvh] w-full isolate"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { GameState, Player } from '../types';
 import Piece from './Piece';
 
@@ -16,6 +17,7 @@ interface PendingMove {
 }
 
 const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidMoves }) => {
+    const { t } = useLanguage();
     const { pieces, tiles, current_player, game_over, tile_counts } = gameState;
     const [selected, setSelected] = useState<number | null>(null);
     const [validMoves, setValidMoves] = useState<number[]>([]);
@@ -98,10 +100,12 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
 
     return (
         <div className="glass-panel p-4 md:p-6 shadow-2xl relative">
+
+
             {/* Tile Selection Overlay */ }
             {pendingMove && !placingTileType && (
                 <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm rounded-2xl flex flex-col justify-center items-center p-6 animate-fadeIn">
-                    <h3 className="text-xl text-white font-bold mb-6">Place a Tile?</h3>
+                    <h3 className="text-xl text-white font-bold mb-6">{t.board.placeTile}</h3>
                     <div className="flex gap-4 mb-6">
                         {tile_counts[(humanPlayer-1)*2+0] > 0 && (
                             <button 
@@ -115,7 +119,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                                     <path d="M17 7l0 2.5M17 7l-2.5 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                                     <path d="M7 17l0 -2.5M7 17l2.5 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                                 </svg>
-                                <span className="text-sm font-bold text-gray-300">Black</span>
+                                <span className="text-sm font-bold text-gray-300">{t.board.tileBlack}</span>
                             </button>
                         )}
                         {tile_counts[(humanPlayer-1)*2+1] > 0 && (
@@ -126,7 +130,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                                 <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                                      <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" strokeLinecap="round" />
                                 </svg>
-                                <span className="text-sm font-bold text-gray-300">Gray</span>
+                                <span className="text-sm font-bold text-gray-300">{t.board.tileGray}</span>
                             </button>
                         )}
                     </div>
@@ -134,13 +138,13 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         onClick={() => { onMove(pendingMove.from, pendingMove.to); clearSelection(); }}
                         className="text-gray-400 hover:text-white underline"
                     >
-                        Skip (No Tile)
+                        {t.board.skip}
                     </button>
                     <button 
                         onClick={clearSelection}
                         className="absolute top-4 right-4 text-gray-500 hover:text-red-400"
                     >
-                        Cancel
+                        {t.board.cancel}
                     </button>
                 </div>
             )}

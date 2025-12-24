@@ -28,10 +28,7 @@
   }
 }
 
-body {
-  @apply font-sans bg-game-bg-dark text-game-text-main min-h-screen overflow-x-hidden;
-  background: radial-gradient(circle at top left, var(--color-game-bg-gradient-start), var(--color-game-bg-dark) 80%);
-}
+/* Global resets moved to index.html classes */
 
 /* Custom classes for pieces */
 /* Custom classes for pieces */

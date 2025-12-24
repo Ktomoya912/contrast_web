@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { GameState, Player } from '../types';
 import EvaluationBar from './EvaluationBar';
+import GameSettings from './GameSettings';
 import PlayerResources from './PlayerResources';
 
 interface ControlsProps {
@@ -14,11 +16,8 @@ interface ControlsProps {
     setSimulationCount: (n: number) => void;
 }
 
-import GameSettings from './GameSettings';
-
-// ... (Interface remains)
-
 const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, setHumanPlayer, onReset, onUndo, simulationCount, setSimulationCount }) => {
+    const { t } = useLanguage();
     const { tile_counts, current_player, game_over, winner } = gameState;
     const isMyTurn = current_player === humanPlayer;
 
@@ -31,8 +30,8 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
                     : (isMyTurn ? "bg-white/10 border-white/20 text-white animate-pulse" : "bg-black/20 border-transparent text-gray-500")
             }`}>
                 {game_over 
-                    ? (winner === humanPlayer ? "VICTORY" : "DEFEAT") 
-                    : (isMyTurn ? "YOUR TURN" : "AI THINKING...")}
+                    ? (winner === humanPlayer ? t.controls.victory : t.controls.defeat) 
+                    : (isMyTurn ? t.controls.yourTurn : t.controls.aiThinking)}
             </div>
             
             {/* Eval Bar */}
@@ -61,13 +60,13 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
                     onClick={onUndo}
                     className="flex-1 py-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95 text-xs"
                 >
-                    Undo
+                    {t.controls.undo}
                 </button>
                 <button 
                     onClick={onReset}
                     className="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_25px_rgba(16,185,129,0.5)] active:scale-95 text-sm"
                 >
-                    New Game
+                    {t.controls.newGame}
                 </button>
             </div>
         </div>

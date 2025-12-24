@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { Player } from '../types';
 
 interface EvaluationBarProps {
@@ -8,6 +9,7 @@ interface EvaluationBarProps {
 }
 
 const EvaluationBar: React.FC<EvaluationBarProps> = ({ aiValue, humanPlayer, className = "" }) => {
+    const { t } = useLanguage();
     // aiValue is the evaluation from the AI's perspective (AI's winning probability: 1.0 = AI win, -1.0 = AI loss).
     // We want the display to be from the Human's perspective (1.0 = Human win).
     // So we simply invert it.
@@ -34,7 +36,7 @@ const EvaluationBar: React.FC<EvaluationBarProps> = ({ aiValue, humanPlayer, cla
                  Let's stick to just the Bar + Labels here.
              */}
             <div className="flex justify-between text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">
-                <span className={humanTextColor}>You</span>
+                <span className={humanTextColor}>{t.app.you}</span>
                 <span className="text-gray-600 font-mono text-[10px]">{displayValue > 0 ? "+" : ""}{displayValue.toFixed(2)}</span>
                 <span className={aiTextColor}>AI</span>
             </div>

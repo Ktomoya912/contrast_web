@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface RulesModalProps {
     isOpen: boolean;
@@ -6,16 +7,7 @@ interface RulesModalProps {
 }
 
 const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
-    // Prevent scrolling when modal is open
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => { document.body.style.overflow = 'unset'; };
-    }, [isOpen]);
-
+    const { t } = useLanguage();
     if (!isOpen) return null;
 
     return (
@@ -25,7 +17,7 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                 {/* Header */}
                 <div className="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-white/10 p-4 flex justify-between items-center z-10">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span className="text-cyan-400 text-2xl">?</span> How to Play
+                        <span className="text-cyan-400 text-2xl">?</span> {t.rules.title}
                     </h2>
                     <button 
                         onClick={onClose}
@@ -42,19 +34,19 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                     
                     {/* Goal */}
                     <section>
-                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">1. Objective</h3>
+                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">{t.rules.objectiveTitle}</h3>
                         <p className="text-gray-300 text-sm leading-relaxed">
-                            Reach the opponent's back rank (the furthest row) with any of your pieces.
+                            {t.rules.objective}
                             <br/>
-                            <span className="text-xs text-gray-500">*First player to touch the goal line wins immediately.</span>
+                            <span className="text-xs text-gray-500">{t.rules.objectiveNote}</span>
                         </p>
                     </section>
 
                     {/* The Mechanic */}
                     <section>
-                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">2. The "Contrast" Movement</h3>
+                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">{t.rules.movementTitle}</h3>
                         <p className="text-gray-300 text-sm mb-4">
-                            Your movement options depend on the <strong>color of the tile</strong> your piece is currently standing on.
+                            {t.rules.movement}
                         </p>
                         
                         <div className="grid gap-3">
@@ -63,8 +55,8 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                                     {/* <span className="text-2xl text-black">✜</span> */}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white text-sm">White Tile</h4>
-                                    <p className="text-xs text-gray-400">Moves Orthogonally (Up, Down, Left, Right)</p>
+                                    <h4 className="font-bold text-white text-sm">{t.rules.whiteTile}</h4>
+                                    <p className="text-xs text-gray-400">{t.rules.whiteMove}</p>
                                 </div>
                             </div>
 
@@ -73,8 +65,8 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                                     {/* <span className="text-2xl text-white">✖</span> */}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white text-sm">Black Tile</h4>
-                                    <p className="text-xs text-gray-400">Moves Diagonally</p>
+                                    <h4 className="font-bold text-white text-sm">{t.rules.blackTile}</h4>
+                                    <p className="text-xs text-gray-400">{t.rules.blackMove}</p>
                                 </div>
                             </div>
                             
@@ -83,8 +75,8 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                                     {/* <span className="text-2xl text-white">✳</span> */}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white text-sm">Gray Tile</h4>
-                                    <p className="text-xs text-gray-400">Moves in all 8 directions (Queen-like)</p>
+                                    <h4 className="font-bold text-white text-sm">{t.rules.grayTile}</h4>
+                                    <p className="text-xs text-gray-400">{t.rules.grayMove}</p>
                                 </div>
                             </div>
                         </div>
@@ -92,14 +84,14 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
 
                     {/* Tile Placement */}
                     <section>
-                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">3. Modifying the Board</h3>
+                        <h3 className="text-lg font-bold text-white mb-2 pb-1 border-b border-white/10">{t.rules.placementTitle}</h3>
                         <p className="text-gray-300 text-sm mb-3">
-                            When you move a piece, if you have tiles remaining, you can <strong>change the destination tile's color</strong>.
+                            {t.rules.placement}
                         </p>
                         <ul className="list-disc list-inside text-sm text-gray-400 space-y-1 ml-1">
-                            <li>You start with a limited number of Black and Gray tiles.</li>
-                            <li>Use them to protect your pieces or trap your opponent!</li>
-                            <li>Changing a tile is optional.</li>
+                            {t.rules.placementList.map((item, i) => (
+                                <li key={i}>{item}</li>
+                            ))}
                         </ul>
                     </section>
                     
@@ -111,7 +103,7 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-colors"
                     >
-                        Got it!
+                        {t.rules.gotIt}
                     </button>
                 </div>
             </div>
