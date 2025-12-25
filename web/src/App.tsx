@@ -7,18 +7,31 @@ import RulesModal from '@/components/RulesModal';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
-import { useGame } from '@/hooks/useGame';
-import '@/index.css';
-import { type Player } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
 import { useEffect, useState } from 'react';
 
 function AppContent() {
   const { t } = useLanguage();
-  const { gameState, aiValue, resetGame, move, undo, getValidMoves, triggerAI, isThinking, error, isReady, simulationCount, setSimulationCount } = useGame();
-  const [humanPlayer, setHumanPlayer] = useState<Player>(1);
+
+  // Store
+  const gameState = useGameStore(state => state.gameState);
+  const humanPlayer = useGameStore(state => state.humanPlayer);
+  const triggerAI = useGameStore(state => state.triggerAI);
+  const isThinking = useGameStore(state => state.isThinking);
+  const error = useGameStore(state => state.error);
+  const isReady = useGameStore(state => state.isReady);
+  const initialize = useGameStore(state => state.initialize);
+  const resetGame = useGameStore(state => state.resetGame);
+  const undo = useGameStore(state => state.undo);
+
   const [showRules, setShowRules] = useState(false);
 
   const opponentPlayer = humanPlayer === 1 ? 2 : 1;
+
+  // Init Wasm
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   // Auto-trigger AI if it's AI turn
   useEffect(() => {
@@ -33,15 +46,11 @@ function AppContent() {
   }, [gameState.current_player, gameState.game_over, humanPlayer, isThinking, isReady, triggerAI]);
 
   const handleReset = () => {
-    resetGame(humanPlayer);
-  };
-
-  const handleMove = (from: number, to: number, tile?: { type: number, x: number, y: number }) => {
-    move(from, to, tile);
+    resetGame();
   };
 
   const handleUndo = () => {
-    undo(humanPlayer);
+    undo();
   };
 
   return (
@@ -83,8 +92,6 @@ function AppContent() {
         <div className="flex justify-between items-center w-full">
           <div className="flex-1 mr-4 min-w-0">
             <EvaluationBar
-              aiValue={aiValue}
-              humanPlayer={humanPlayer}
               className="w-full"
             />
           </div>
@@ -135,27 +142,13 @@ function AppContent() {
 
       <main className="flex-grow flex flex-col lg:flex-row gap-6 md:gap-12 items-center lg:items-start max-w-7xl w-full justify-center relative z-10 p-2 md:p-0 mx-auto">
         <div className="order-2 lg:order-1 touch-none">
-          <Board
-            gameState={gameState}
-            humanPlayer={humanPlayer}
-            onMove={handleMove}
-            getValidMoves={getValidMoves}
-          />
+          <Board />
         </div>
 
         <div className="order-1 lg:order-2 w-full lg:w-auto min-w-[300px] max-w-sm">
           {/* Desktop Controls (Full) */}
           <div className="hidden md:block">
-            <Controls
-              gameState={gameState}
-              aiValue={aiValue}
-              humanPlayer={humanPlayer}
-              setHumanPlayer={setHumanPlayer}
-              simulationCount={simulationCount}
-              setSimulationCount={setSimulationCount}
-              onReset={handleReset}
-              onUndo={handleUndo}
-            />
+            <Controls />
           </div>
 
           {/* Mobile Bottom Controls (Settings/Reset only) */}
@@ -171,12 +164,7 @@ function AppContent() {
                 {t.app.newGame}
               </Button>
 
-              <GameSettings
-                humanPlayer={humanPlayer}
-                setHumanPlayer={setHumanPlayer}
-                simulationCount={simulationCount}
-                setSimulationCount={setSimulationCount}
-              />
+              <GameSettings />
             </CardContent>
           </Card>
         </div>

@@ -5,22 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { GameState, Player } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
 import React from 'react';
 
-interface ControlsProps {
-    gameState: GameState;
-    aiValue: number;
-    humanPlayer: Player;
-    setHumanPlayer: (p: Player) => void;
-    onReset: () => void;
-    onUndo: () => void;
-    simulationCount: number;
-    setSimulationCount: (n: number) => void;
-}
+interface ControlsProps { }
 
-const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, setHumanPlayer, onReset, onUndo, simulationCount, setSimulationCount }) => {
+const Controls: React.FC<ControlsProps> = () => {
     const { t } = useLanguage();
+
+    const gameState = useGameStore(state => state.gameState);
+    const humanPlayer = useGameStore(state => state.humanPlayer);
+    const resetGame = useGameStore(state => state.resetGame);
+    const undo = useGameStore(state => state.undo);
+
     const { tile_counts, current_player, game_over, winner } = gameState;
     const isMyTurn = current_player === humanPlayer;
 
@@ -39,10 +36,7 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
                 </div>
 
                 {/* Eval Bar */}
-                <EvaluationBar
-                    aiValue={aiValue}
-                    humanPlayer={humanPlayer}
-                />
+                <EvaluationBar />
 
                 {/* Resources / Tile Counts */}
                 <div className="space-y-4">
@@ -52,26 +46,21 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
 
                 <div className="flex gap-3">
                     <Button
-                        onClick={onUndo}
+                        onClick={() => undo()}
                         variant="secondary"
                         className="flex-1 py-6 bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold uppercase tracking-widest rounded-xl shadow-lg active:scale-95 text-xs h-auto"
                     >
                         {t.controls.undo}
                     </Button>
                     <Button
-                        onClick={onReset}
+                        onClick={() => resetGame()}
                         className="flex-[2] py-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-black uppercase tracking-widest rounded-xl shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_25px_rgba(16,185,129,0.5)] active:scale-95 text-sm h-auto border-0"
                     >
                         {t.controls.newGame}
                     </Button>
                 </div>
                 {/* Settings */}
-                <GameSettings
-                    humanPlayer={humanPlayer}
-                    setHumanPlayer={setHumanPlayer}
-                    simulationCount={simulationCount}
-                    setSimulationCount={setSimulationCount}
-                />
+                <GameSettings />
 
 
             </CardContent>

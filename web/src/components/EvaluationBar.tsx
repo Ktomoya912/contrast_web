@@ -1,14 +1,14 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Player } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
 import React from 'react';
 
 interface EvaluationBarProps {
-    aiValue: number;
-    humanPlayer: Player;
     className?: string; // Allow custom styling/positioning
 }
 
-const EvaluationBar: React.FC<EvaluationBarProps> = ({ aiValue, humanPlayer, className = "" }) => {
+const EvaluationBar: React.FC<EvaluationBarProps> = ({ className = "" }) => {
+    const aiValue = useGameStore(state => state.aiValue);
+    const humanPlayer = useGameStore(state => state.humanPlayer);
     const { t } = useLanguage();
     // aiValue is the evaluation from the AI's perspective (AI's winning probability: 1.0 = AI win, -1.0 = AI loss).
     // We want the display to be from the Human's perspective (1.0 = Human win).

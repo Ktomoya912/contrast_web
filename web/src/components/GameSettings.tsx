@@ -3,19 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from "@/lib/utils";
-import type { Player } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
 import React from 'react';
 
 interface GameSettingsProps {
-    humanPlayer: Player;
-    setHumanPlayer: (p: Player) => void;
-    simulationCount: number;
-    setSimulationCount: (n: number) => void;
     className?: string;
 }
 
-const GameSettings: React.FC<GameSettingsProps> = ({ humanPlayer, setHumanPlayer, simulationCount, setSimulationCount, className = "" }) => {
+const GameSettings: React.FC<GameSettingsProps> = ({ className = "" }) => {
     const { t, language, setLanguage } = useLanguage();
+
+    const humanPlayer = useGameStore(state => state.humanPlayer);
+    const setHumanPlayer = useGameStore(state => state.setHumanPlayer);
+    const simulationCount = useGameStore(state => state.simulationCount);
+    const setSimulationCount = useGameStore(state => state.setSimulationCount);
 
     const handleSimChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseInt(e.target.value);

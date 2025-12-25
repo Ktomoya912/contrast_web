@@ -9,16 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { GameState, Player } from '@/types';
+import { useGameStore } from '@/store/useGameStore';
 import { cva } from 'class-variance-authority';
 import React, { useState } from 'react';
 
-interface BoardProps {
-    gameState: GameState;
-    humanPlayer: Player;
-    onMove: (from: number, to: number, tile?: { type: number, x: number, y: number }) => void;
-    getValidMoves: (x: number, y: number) => number[];
-}
+// Props removed - using store
+interface BoardProps { }
 
 // Types
 interface PendingMove {
@@ -57,7 +53,13 @@ const tileVariants = cva(
     }
 );
 
-const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidMoves }) => {
+const Board: React.FC<BoardProps> = () => {
+    // Store access
+    const gameState = useGameStore(state => state.gameState);
+    const humanPlayer = useGameStore(state => state.humanPlayer);
+    const move = useGameStore(state => state.move);
+    const getValidMoves = useGameStore(state => state.getValidMoves);
+
     const { t } = useLanguage();
     const { pieces, tiles, current_player, game_over, tile_counts } = gameState;
     const [selected, setSelected] = useState<number | null>(null);
@@ -87,8 +89,10 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
 
             if (!isOccupied) {
                 // Confirm Move + Tile
-                const moveData = { type: placingTileType, x: idx % 5, y: Math.floor(idx / 5) };
-                handleCommit(moveData);
+                move(pendingMove.from, pendingMove.to, { type: placingTileType, x: idx % 5, y: Math.floor(idx / 5) });
+
+                // Allow animation to play out
+                clearSelection();
             }
             return;
         }
@@ -112,7 +116,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                 setIsPlacementOpen(true);
             } else {
                 // No tiles, just move
-                onMove(selected, idx);
+                move(selected, idx);
                 clearSelection();
             }
             return;
@@ -153,15 +157,10 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
         if (!pendingMove) return;
         const from = pendingMove.from;
         const to = pendingMove.to;
-        handleClose(() => onMove(from, to));
+        handleClose(() => move(from, to));
     };
 
-    const handleCommit = (tileData: { type: number, x: number, y: number }) => {
-        if (!pendingMove) return;
-        const from = pendingMove.from;
-        const to = pendingMove.to;
-        handleClose(() => onMove(from, to, tileData));
-    }
+
 
     const handleSelectTile = (type: number) => {
         setPlacingTileType(type);
