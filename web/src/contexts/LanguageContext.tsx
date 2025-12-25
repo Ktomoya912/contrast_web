@@ -1,6 +1,6 @@
+import { en } from '@/i18n/en';
+import { ja } from '@/i18n/ja';
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
-import { en } from '../i18n/en';
-import { ja } from '../i18n/ja';
 
 type Language = 'ja' | 'en';
 type Translation = typeof ja;

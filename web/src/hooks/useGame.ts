@@ -1,6 +1,6 @@
+import type { GameState, Player } from '@/types';
+import { INITIAL_STATE } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
-import type { GameState, Player } from '../types';
-import { INITIAL_STATE } from '../types';
 
 // Define the Wasm module interface
 interface WasmModule {

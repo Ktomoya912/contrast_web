@@ -1,14 +1,15 @@
+import Board from '@/components/Board';
+import Controls from '@/components/Controls';
+import EvaluationBar from '@/components/EvaluationBar';
+import GameSettings from '@/components/GameSettings';
+import PlayerResources from '@/components/PlayerResources';
+import RulesModal from '@/components/RulesModal';
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { useGame } from '@/hooks/useGame';
+import '@/index.css';
+import { cn } from '@/lib/utils';
+import { type Player } from '@/types';
 import { useEffect, useState } from 'react';
-import Board from './components/Board';
-import Controls from './components/Controls';
-import EvaluationBar from './components/EvaluationBar';
-import GameSettings from './components/GameSettings';
-import PlayerResources from './components/PlayerResources';
-import RulesModal from './components/RulesModal';
-import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
-import { useGame } from './hooks/useGame';
-import './index.css';
-import { type Player } from './types';
 
 function AppContent() {
   const { t } = useLanguage();
@@ -119,14 +120,18 @@ function AppContent() {
        </header>
        
        {!isReady && !error && (
-           <div className="mb-4 flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl px-4 py-2 text-cyan-400 animate-pulse text-sm md:text-base">
+           <div className={cn("mb-4 flex items-center gap-3 px-4 py-2 text-cyan-400 animate-pulse text-sm md:text-base",
+               "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl"
+           )}>
              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
              {t.app.loading}
            </div>
        )}
        
        {error && (
-           <div className="mb-8 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl px-6 py-4 border-red-500/50 text-red-400 font-bold flex flex-col items-center">
+           <div className={cn("mb-8 px-6 py-4 border-red-500/50 text-red-400 font-bold flex flex-col items-center",
+               "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl"
+           )}>
              <span className="text-2xl mb-2">⚠️</span>
              {error}
            </div>
@@ -159,7 +164,9 @@ function AppContent() {
              </div>
              
              {/* Mobile Bottom Controls (Settings/Reset only) */}
-             <div className="md:hidden w-full mt-4 bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl p-4">
+             <div className={cn("md:hidden w-full mt-4 p-4",
+                 "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl"
+             )}>
                  <h3 className="text-white font-bold mb-3 text-sm border-b border-white/10 pb-2">{t.app.settings}</h3>
                  <div className="flex flex-col gap-4">
                       <button 

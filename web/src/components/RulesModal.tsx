@@ -1,5 +1,5 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface RulesModalProps {
     isOpen: boolean;
@@ -71,9 +71,7 @@ const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
                             </div>
                             
                             <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                                <div className="w-12 h-12 rounded-lg bg-slate-500 flex items-center justify-center shadow-inner border border-white/10">
-                                    {/* <span className="text-2xl text-white">✳</span> */}
-                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-slate-500 flex items-center justify-center shadow-inner border border-white/10" />
                                 <div>
                                     <h4 className="font-bold text-white text-sm">{t.rules.grayTile}</h4>
                                     <p className="text-xs text-gray-400">{t.rules.grayMove}</p>

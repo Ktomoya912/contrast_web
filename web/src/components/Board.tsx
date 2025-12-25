@@ -1,7 +1,9 @@
+import Piece from '@/components/Piece';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import type { GameState, Player } from '@/types';
+import { cva } from 'class-variance-authority';
 import React, { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import type { GameState, Player } from '../types';
-import Piece from './Piece';
 
 interface BoardProps {
     gameState: GameState;
@@ -16,14 +18,36 @@ interface PendingMove {
     to: number;
 }
 
-// Style Constants
+
 const GLASS_PANEL = "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl";
 
-const TILE_BASE = "relative w-12 h-12 md:w-20 md:h-20 rounded-lg md:rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)]";
-
-const TILE_WHITE = "bg-gradient-to-br from-slate-50 to-slate-200 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_5px_rgba(0,0,0,0.1)]";
-const TILE_BLACK = "bg-gradient-to-br from-slate-700 to-slate-900 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_5px_rgba(0,0,0,0.3)]";
-const TILE_GRAY = "bg-gradient-to-br from-slate-400 to-slate-600 border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.2)]";
+const tileVariants = cva(
+    "relative size-12 md:size-20 rounded-lg md:rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)] group",
+    {
+        variants: {
+            type: {
+                0: "bg-gradient-to-br from-slate-50 to-slate-200 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_5px_rgba(0,0,0,0.1)]", // White
+                1: "bg-gradient-to-br from-slate-700 to-slate-900 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_5px_rgba(0,0,0,0.3)]", // Black
+                2: "bg-gradient-to-br from-slate-400 to-slate-600 border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.2)]", // Gray
+            },
+            selected: {
+                true: "ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900 shadow-[0_0_15px_rgba(250,204,21,0.5)] scale-105 z-20",
+            },
+            validMove: {
+                true: "ring-2 ring-emerald-400/50 hover:ring-emerald-400 hover:bg-emerald-400/10 z-10 scale-[1.02] cursor-pointer",
+            },
+            placementTarget: {
+                true: "ring-2 ring-cyan-400 bg-cyan-400/20 animate-pulse z-30 scale-105 cursor-pointer",
+            },
+            dimmed: {
+                true: "opacity-30 grayscale",
+            }
+        },
+        defaultVariants: {
+            type: 0
+        }
+    }
+);
 
 const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidMoves }) => {
     const { t } = useLanguage();
@@ -108,7 +132,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
     };
 
     return (
-        <div className={`${GLASS_PANEL} p-4 md:p-6 shadow-2xl relative flex flex-col items-center`}>
+        <div className={cn(GLASS_PANEL, "p-4 md:p-6 shadow-2xl relative flex flex-col items-center")}>
 
 
             {/* Tile Selection Overlay */ }
@@ -119,7 +143,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         {tile_counts[(humanPlayer-1)*2+0] > 0 && (
                             <button 
                                 onClick={() => setPlacingTileType(1)}
-                                className={`flex flex-col items-center gap-2 ${TILE_BLACK} p-4 rounded-xl transition-all hover:scale-105`}
+                                className={cn("flex flex-col items-center gap-2 p-4 rounded-xl transition-all hover:scale-105", tileVariants({ type: 1 }))}
                             >
                                 <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="currentColor">
                                     <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -134,7 +158,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         {tile_counts[(humanPlayer-1)*2+1] > 0 && (
                             <button 
                                 onClick={() => setPlacingTileType(2)}
-                                className={`flex flex-col items-center gap-2 ${TILE_GRAY} p-4 rounded-xl transition-all hover:scale-105`}
+                                className={cn("flex flex-col items-center gap-2 p-4 rounded-xl transition-all hover:scale-105", tileVariants({ type: 2 }))}
                             >
                                 <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                                      <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" strokeLinecap="round" />
@@ -159,7 +183,7 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
             )}
             
             {/* Board Frame */}
-            <div className={`absolute inset-0 bg-transparent rounded-2xl pointer-events-none transition-opacity duration-300 ${pendingMove ? "opacity-20" : "opacity-100"}`}></div>
+            <div className={cn("absolute inset-0 bg-transparent rounded-2xl pointer-events-none transition-opacity duration-300", pendingMove ? "opacity-20" : "opacity-100")}></div>
             
             <div className="grid grid-cols-5 gap-3 relative z-10">
                 {Array.from({ length: 25 }).map((_, idx) => {
@@ -172,36 +196,18 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                     const isPlacementTarget = placingTileType !== null && tileType === 0 && 
                         !((piece !== 0 && idx !== pendingMove?.from) || idx === pendingMove?.to);
                     
-                    // Base Classes
-                    let baseClasses = `${TILE_BASE} group `;
-                    if (tileType === 0) baseClasses += TILE_WHITE;
-                    else if (tileType === 1) baseClasses += TILE_BLACK;
-                    else baseClasses += TILE_GRAY;
-
-                    // Selection Glow
-                    if (isSelected) {
-                        baseClasses += " ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900 shadow-[0_0_15px_rgba(250,204,21,0.5)] scale-105 z-20";
-                    }
-                    
-                    // Valid Move Target
-                    if (isValidMove) {
-                         baseClasses += " ring-2 ring-emerald-400/50 hover:ring-emerald-400 hover:bg-emerald-400/10 z-10 scale-[1.02] cursor-pointer";
-                    }
-                    
-                    // Placement Target
-                    if (isPlacementTarget) {
-                        baseClasses += " ring-2 ring-cyan-400 bg-cyan-400/20 animate-pulse z-30 scale-105 cursor-pointer";
-                    }
-                    
-                    // Dim others during pending
-                    if (pendingMove && !isPlacementTarget && !isSelected && idx !== pendingMove.to && !(idx === pendingMove.from)) {
-                        baseClasses += " opacity-30 grayscale";
-                    }
+                    const isDimmed = pendingMove && !isPlacementTarget && !isSelected && idx !== pendingMove.to && !(idx === pendingMove.from);
 
                     return (
                         <div 
                             key={idx}
-                            className={baseClasses}
+                            className={tileVariants({ 
+                                type: tileType as 0|1|2, 
+                                selected: isSelected, 
+                                validMove: isValidMove, 
+                                placementTarget: !!isPlacementTarget,
+                                dimmed: !!isDimmed
+                            })}
                             onClick={() => handleCellClick(idx)}
                         >
                             {/* Ghost Piece */}

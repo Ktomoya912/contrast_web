@@ -1,9 +1,10 @@
+import EvaluationBar from '@/components/EvaluationBar';
+import GameSettings from '@/components/GameSettings';
+import PlayerResources from '@/components/PlayerResources';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import type { GameState, Player } from '@/types';
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import type { GameState, Player } from '../types';
-import EvaluationBar from './EvaluationBar';
-import GameSettings from './GameSettings';
-import PlayerResources from './PlayerResources';
 
 interface ControlsProps {
     gameState: GameState;
@@ -22,7 +23,9 @@ const Controls: React.FC<ControlsProps> = ({ gameState, aiValue, humanPlayer, se
     const isMyTurn = current_player === humanPlayer;
 
     return (
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl p-6 w-full max-w-sm">
+        <div className={cn("p-6 w-full max-w-sm",
+            "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl"
+        )}>
             {/* Status Bar */}
             <div className={`text-center py-4 rounded-xl mb-6 font-bold text-lg tracking-wide transition-colors duration-500 border ${
                 game_over 

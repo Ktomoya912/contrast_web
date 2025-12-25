@@ -1,5 +1,5 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface PlayerResourcesProps {
     tileCounts: number[]; // [P1_Black, P1_Gray, P2_Black, P2_Gray]
@@ -28,10 +28,10 @@ const PlayerResources: React.FC<PlayerResourcesProps> = ({ tileCounts, targetPla
                 <span className={`text-xs font-bold ${pColor}`}>{label || pName}</span>
                 <div className="flex gap-3">
                     <span className="text-xs text-white flex items-center gap-1">
-                        <span className="text-gray-500">⬛</span> {blackCount}
+                        <div className="border border-white size-4 bg-black" /> {blackCount}
                     </span>
                     <span className="text-xs text-white flex items-center gap-1">
-                        <span className="text-gray-500">⬜</span> {grayCount}
+                        <div className="border border-white size-4 bg-slate-500" /> {grayCount}
                     </span>
                 </div>
             </div>

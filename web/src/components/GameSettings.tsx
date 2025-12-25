@@ -1,6 +1,6 @@
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Player } from '@/types';
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import type { Player } from '../types';
 
 interface GameSettingsProps {
     humanPlayer: Player;
