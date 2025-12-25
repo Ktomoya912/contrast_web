@@ -70,7 +70,7 @@ const Board: React.FC<BoardProps> = () => {
     const [placingTileType, setPlacingTileType] = useState<number | null>(null); // 1=Black, 2=Gray
     const [isPlacementOpen, setIsPlacementOpen] = useState(false);
 
-    const handleCellClick = (idx: number) => {
+    const handleCellClick = async (idx: number) => {
         if (game_over) return;
         if (current_player !== humanPlayer) return;
 
@@ -128,7 +128,8 @@ const Board: React.FC<BoardProps> = () => {
                 clearSelection();
             } else {
                 setSelected(idx);
-                const moves = getValidMoves(x, y);
+                // Async fetch valid moves
+                const moves = await getValidMoves(x, y);
                 setValidMoves(moves);
             }
         } else {
