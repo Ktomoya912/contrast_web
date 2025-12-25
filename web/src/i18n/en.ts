@@ -3,7 +3,7 @@ export const en = {
         description: "Play against the AlphaZero AI.",
         howToPlay: "How to Play",
         loading: "AI Starting...",
-        opponent: "Opponent",
+        opponent: "AI",
         you: "You",
         undo: "Undo",
         newGame: "New Game",
@@ -15,7 +15,8 @@ export const en = {
         tileBlack: "Black (Diagonal)",
         tileGray: "Gray (8-way)",
         skip: "Skip",
-        cancel: "Cancel"
+        cancel: "Cancel",
+        description: "Select a tile to place, or skip this step."
     },
     controls: {
         victory: "VICTORY!",
@@ -56,7 +57,7 @@ export const en = {
         blackTile: "Black Tile",
         blackMove: "Moves Diagonally",
         grayTile: "Gray Tile",
-        grayMove: "Moves in All 8 Directions (Queen)",
+        grayMove: "Moves in All 8 Directions",
         placementTitle: "3. Modifying the Board",
         placement: "After moving, if you have tiles, you can change the color of the tile you landed on.",
         placementList: [

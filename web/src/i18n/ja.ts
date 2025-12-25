@@ -3,7 +3,7 @@ export const ja = {
         description: "AI プレイヤと対戦ができます。",
         howToPlay: "ルールを見る",
         loading: "AI起動中...",
-        opponent: "相手",
+        opponent: "AI",
         you: "あなた",
         undo: "一手戻す",
         newGame: "最初から",
@@ -15,7 +15,8 @@ export const ja = {
         tileBlack: "黒 (斜め)",
         tileGray: "グレー (全方向)",
         skip: "使用しない",
-        cancel: "キャンセル"
+        cancel: "キャンセル",
+        description: "タイルを置く場所を選択するか、使用しないを選択してください。"
     },
     controls: {
         victory: "勝利！",
@@ -56,7 +57,7 @@ export const ja = {
         blackTile: "黒いタイル",
         blackMove: "斜め方向に移動可能",
         grayTile: "グレーのタイル",
-        grayMove: "全8方向に移動可能 (クイーンの動き)",
+        grayMove: "全8方向に移動可能",
         placementTitle: "3. タイルの配置",
         placement: "駒を移動させた際、手持ちのタイルがあれば、移動先のタイルの色を変えることができます。",
         placementList: [

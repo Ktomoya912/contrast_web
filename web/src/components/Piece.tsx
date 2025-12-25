@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority';
 import React from 'react';
 
 const pieceVariants = cva(
-    "size-10 md:size-16 flex justify-center items-center text-xl text-white font-black relative z-10 transition-all duration-300 backdrop-blur-[1px] [text-shadow:0_1px_2px_rgba(0,0,0,0)]",
+    "size-16 md:size-20 flex justify-center items-center text-xl text-white font-black relative z-10 transition-all duration-300 backdrop-blur-[1px] [text-shadow:0_1px_2px_rgba(0,0,0,0)]",
     {
         variants: {
             player: {
@@ -19,7 +19,7 @@ interface PieceProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Piece: React.FC<PieceProps> = ({ player, className, ...props }) => {
-    
+
     // Internal helper for static arrows
     const getPieceArrows = () => (
         <>
@@ -34,7 +34,7 @@ const Piece: React.FC<PieceProps> = ({ player, className, ...props }) => {
                 <path d="M7 15l-3-3 3-3" />
                 <path d="M17 15l3-3-3-3" />
             </g>
-            
+
             {/* White Diagonal Arrows */}
             <g className="text-white">
                 <path d="M5 5l14 14" />
@@ -51,9 +51,9 @@ const Piece: React.FC<PieceProps> = ({ player, className, ...props }) => {
     const getPieceBorder = (p: number) => {
         if (p === 1) { // P1 Red Up Pentagon
             return (
-                <path 
-                    d="M12 1.5 L22.5 6.5 L22.5 20.5 L1.5 20.5 L1.5 6.5 Z" 
-                    fill="none" 
+                <path
+                    d="M12 1.5 L22.5 6.5 L22.5 20.5 L1.5 20.5 L1.5 6.5 Z"
+                    fill="none"
                     stroke="#ef4444" // Red-500
                     strokeWidth="2"
                     strokeLinejoin="round"
@@ -62,9 +62,9 @@ const Piece: React.FC<PieceProps> = ({ player, className, ...props }) => {
             );
         } else { // P2 Blue Down Pentagon
             return (
-                <path 
-                    d="M1.5 3.5 L22.5 3.5 L22.5 17 L12 22.5 L1.5 17 Z" 
-                    fill="none" 
+                <path
+                    d="M1.5 3.5 L22.5 3.5 L22.5 17 L12 22.5 L1.5 17 Z"
+                    fill="none"
                     stroke="#3b82f6" // Blue-500
                     strokeWidth="2"
                     strokeLinejoin="round"

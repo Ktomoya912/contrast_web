@@ -1,4 +1,12 @@
 import Piece from '@/components/Piece';
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { GameState, Player } from '@/types';
@@ -8,7 +16,7 @@ import React, { useState } from 'react';
 interface BoardProps {
     gameState: GameState;
     humanPlayer: Player;
-    onMove: (from: number, to: number, tile?: {type: number, x: number, y: number}) => void;
+    onMove: (from: number, to: number, tile?: { type: number, x: number, y: number }) => void;
     getValidMoves: (x: number, y: number) => number[];
 }
 
@@ -22,7 +30,7 @@ interface PendingMove {
 const GLASS_PANEL = "bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl";
 
 const tileVariants = cva(
-    "relative size-12 md:size-20 rounded-lg md:rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)] group",
+    "relative size-16 md:size-20 rounded-lg md:rounded-xl transition-all duration-300 overflow-hidden flex justify-center items-center shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)] group",
     {
         variants: {
             type: {
@@ -54,10 +62,11 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
     const { pieces, tiles, current_player, game_over, tile_counts } = gameState;
     const [selected, setSelected] = useState<number | null>(null);
     const [validMoves, setValidMoves] = useState<number[]>([]);
-    
+
     // Tile Placement State
     const [pendingMove, setPendingMove] = useState<PendingMove | null>(null);
     const [placingTileType, setPlacingTileType] = useState<number | null>(null); // 1=Black, 2=Gray
+    const [isPlacementOpen, setIsPlacementOpen] = useState(false);
 
     const handleCellClick = (idx: number) => {
         if (game_over) return;
@@ -68,20 +77,18 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
             // User is trying to place a tile at 'idx'
             const tileType = tiles[idx];
             const piece = pieces[idx];
-            
+
             // Simplified check: Tile must be White (0).
             if (tileType !== 0) return; // Must be white
-            
+
             let isOccupied = piece !== 0;
             if (idx === pendingMove.from) isOccupied = false;
             if (idx === pendingMove.to) isOccupied = true;
-            
+
             if (!isOccupied) {
                 // Confirm Move + Tile
-                const x = idx % 5;
-                const y = Math.floor(idx / 5);
-                onMove(pendingMove.from, pendingMove.to, { type: placingTileType, x, y });
-                clearSelection();
+                const moveData = { type: placingTileType, x: idx % 5, y: Math.floor(idx / 5) };
+                handleCommit(moveData);
             }
             return;
         }
@@ -93,23 +100,24 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
 
         // If clicking on a valid move destination
         if (selected !== null && validMoves.includes(idx)) {
-             // Check if we can place a tile?
-             // Get current player tile counts
-             const pIdx = humanPlayer - 1;
-             const hasBlack = tile_counts[pIdx * 2 + 0] > 0;
-             const hasGray = tile_counts[pIdx * 2 + 1] > 0;
-             
-             if (hasBlack || hasGray) {
-                 // Enter Tile Placement Mode
-                 setPendingMove({ from: selected, to: idx });
-             } else {
-                 // No tiles, just move
-                 onMove(selected, idx);
-                 clearSelection();
-             }
-             return;
+            // Check if we can place a tile?
+            // Get current player tile counts
+            const pIdx = humanPlayer - 1;
+            const hasBlack = tile_counts[pIdx * 2 + 0] > 0;
+            const hasGray = tile_counts[pIdx * 2 + 1] > 0;
+
+            if (hasBlack || hasGray) {
+                // Enter Tile Placement Mode
+                setPendingMove({ from: selected, to: idx });
+                setIsPlacementOpen(true);
+            } else {
+                // No tiles, just move
+                onMove(selected, idx);
+                clearSelection();
+            }
+            return;
         }
-        
+
         // Normal selection logic
         if (piece === humanPlayer) {
             if (selected === idx) {
@@ -123,88 +131,131 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
             clearSelection();
         }
     };
-    
+
     const clearSelection = () => {
         setSelected(null);
         setValidMoves([]);
         setPendingMove(null);
         setPlacingTileType(null);
+        setIsPlacementOpen(false);
+    };
+
+    // Smooth closing helper
+    const handleClose = (cb?: () => void) => {
+        setIsPlacementOpen(false);
+        setTimeout(() => {
+            if (cb) cb();
+            clearSelection();
+        }, 150); // Small delay to allow dialog close animation to start/finish smoothly without state jump
+    };
+
+    const handleSkip = () => {
+        if (!pendingMove) return;
+        const from = pendingMove.from;
+        const to = pendingMove.to;
+        handleClose(() => onMove(from, to));
+    };
+
+    const handleCommit = (tileData: { type: number, x: number, y: number }) => {
+        if (!pendingMove) return;
+        const from = pendingMove.from;
+        const to = pendingMove.to;
+        handleClose(() => onMove(from, to, tileData));
+    }
+
+    const handleSelectTile = (type: number) => {
+        setPlacingTileType(type);
+        setIsPlacementOpen(false);
     };
 
     return (
         <div className={cn(GLASS_PANEL, "p-4 md:p-6 shadow-2xl relative flex flex-col items-center")}>
 
+            {/* Custom Cancel Button for Tile Placement Phase */}
+            {pendingMove && placingTileType && (
+                <div className="absolute top-4 z-40 animate-fadeIn">
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={clearSelection}
+                        className="shadow-lg hover:scale-105 transition-transform font-bold"
+                    >
+                        {t.board.cancel}
+                    </Button>
+                </div>
+            )}
 
-            {/* Tile Selection Overlay */ }
-            {pendingMove && !placingTileType && (
-                <div className="bg-black/60 backdrop-blur-sm rounded-2xl flex flex-col justify-center items-center p-6 animate-fadeIn">
-                    <h3 className="text-xl text-white font-bold mb-6">{t.board.placeTile}</h3>
-                    <div className="flex gap-4 mb-6">
-                        {tile_counts[(humanPlayer-1)*2+0] > 0 && (
-                            <button 
-                                onClick={() => setPlacingTileType(1)}
-                                className={cn("flex flex-col items-center gap-2 p-4 rounded-xl transition-all hover:scale-105", tileVariants({ type: 1 }))}
+            {/* Shadcn Dialog for Tile Placement */}
+            <Dialog open={isPlacementOpen} onOpenChange={(open) => !open && handleClose()}>
+                <DialogContent className="bg-game-bg-dark border-white/10 text-white sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{t.board.placeTile}</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            {t.board.description}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex gap-4 justify-center py-6">
+                        {tile_counts[(humanPlayer - 1) * 2 + 0] > 0 && (
+                            <button
+                                onClick={() => handleSelectTile(1)}
+                                className={cn("p-4 rounded-xl transition-all hover:scale-105 ring-2 ring-transparent hover:ring-white/20", tileVariants({ type: 1 }))}
                             >
-                                <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="currentColor">
-                                    <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                                    <path d="M7 7l2.5 0M7 7l0 2.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                                    <path d="M17 17l-2.5 0M17 17l0 -2.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                                    <path d="M17 7l0 2.5M17 7l-2.5 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                                    <path d="M7 17l0 -2.5M7 17l2.5 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                                </svg>
-                                <span className="text-sm font-bold text-gray-300">{t.board.tileBlack}</span>
+                                <span className="text-sm font-bold text-gray-300 sr-only">{t.board.tileBlack}</span>
                             </button>
                         )}
-                        {tile_counts[(humanPlayer-1)*2+1] > 0 && (
-                            <button 
-                                onClick={() => setPlacingTileType(2)}
-                                className={cn("flex flex-col items-center gap-2 p-4 rounded-xl transition-all hover:scale-105", tileVariants({ type: 2 }))}
+                        {tile_counts[(humanPlayer - 1) * 2 + 1] > 0 && (
+                            <button
+                                onClick={() => handleSelectTile(2)}
+                                className={cn("p-4 rounded-xl transition-all hover:scale-105 ring-2 ring-transparent hover:ring-white/20", tileVariants({ type: 2 }))}
                             >
-                                <svg viewBox="0 0 24 24" className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                                     <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" strokeLinecap="round" />
-                                </svg>
-                                <span className="text-sm font-bold text-gray-300">{t.board.tileGray}</span>
+                                <span className="text-sm font-bold text-gray-300 sr-only">{t.board.tileGray}</span>
                             </button>
                         )}
                     </div>
-                    <button 
-                        onClick={() => { onMove(pendingMove.from, pendingMove.to); clearSelection(); }}
-                        className="text-gray-400 hover:text-white underline"
-                    >
-                        {t.board.skip}
-                    </button>
-                    <button 
-                        onClick={clearSelection}
-                        className="absolute top-4 right-4 text-gray-500 hover:text-red-400"
-                    >
-                        {t.board.cancel}
-                    </button>
-                </div>
-            )}
-            
+
+                    <div className="flex justify-between items-center px-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => handleClose()}
+                            className="text-gray-500 hover:text-red-400 hover:bg-white/5"
+                        >
+                            {t.board.cancel}
+                        </Button>
+                        <Button
+                            variant="link"
+                            onClick={handleSkip}
+                            className="text-gray-400 hover:text-white"
+                        >
+                            {t.board.skip}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
             {/* Board Frame */}
             <div className={cn("absolute inset-0 bg-transparent rounded-2xl pointer-events-none transition-opacity duration-300", pendingMove ? "opacity-20" : "opacity-100")}></div>
-            
+
             <div className="grid grid-cols-5 gap-3 relative z-10">
                 {Array.from({ length: 25 }).map((_, idx) => {
                     const tileType = tiles[idx];
                     const piece = pieces[idx];
                     const isSelected = selected === idx;
                     const isValidMove = validMoves.includes(idx);
-                    
+
                     // Highlight valid tile placement spots
-                    const isPlacementTarget = placingTileType !== null && tileType === 0 && 
+                    const isPlacementTarget = placingTileType !== null && tileType === 0 &&
                         !((piece !== 0 && idx !== pendingMove?.from) || idx === pendingMove?.to);
-                    
+
                     const isDimmed = pendingMove && !isPlacementTarget && !isSelected && idx !== pendingMove.to && !(idx === pendingMove.from);
 
                     return (
-                        <div 
+                        <div
                             key={idx}
-                            className={tileVariants({ 
-                                type: tileType as 0|1|2, 
-                                selected: isSelected, 
-                                validMove: isValidMove, 
+                            className={tileVariants({
+                                type: tileType as 0 | 1 | 2,
+                                selected: isSelected,
+                                validMove: isValidMove,
                                 placementTarget: !!isPlacementTarget,
                                 dimmed: !!isDimmed
                             })}
@@ -212,41 +263,41 @@ const Board: React.FC<BoardProps> = ({ gameState, humanPlayer, onMove, getValidM
                         >
                             {/* Ghost Piece */}
                             {pendingMove && idx === pendingMove.to && (
-                                <Piece 
-                                    player={humanPlayer} 
-                                    className="opacity-50 absolute inset-0 m-auto" 
+                                <Piece
+                                    player={humanPlayer}
+                                    className="opacity-50 absolute inset-0 m-auto"
                                 />
                             )}
 
                             {/* Actual Piece */}
                             {piece !== 0 && !(pendingMove && idx === pendingMove.from) && (
-                                <Piece 
-                                    player={piece} 
-                                    className="[animation:fadeIn_0.3s_ease-out_forwards]" 
+                                <Piece
+                                    player={piece}
+                                    className="[animation:fadeIn_0.3s_ease-out_forwards]"
                                 />
                             )}
-                            
+
                             {/* Valid Move Indicator */}
                             {isValidMove && piece === 0 && (
                                 <div className="absolute w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse z-20"></div>
                             )}
-                            
+
                             {/* Capture Indicator */}
                             {isValidMove && piece !== 0 && (
                                 <div className="absolute inset-0 border-4 border-red-500 rounded-xl animate-pulse z-20"></div>
                             )}
-                            
-                             {/* Placement Icon Hint */}
+
+                            {/* Placement Icon Hint */}
                             {isPlacementTarget && (
                                 <div className="absolute inset-0 flex justify-center items-center text-cyan-800 text-3xl font-bold opacity-80 z-20">
-                                    {placingTileType === 1 ? "✖" : "✳"}
+
                                 </div>
                             )}
                         </div>
                     );
                 })}
             </div>
-            
+
             {/* Coordinates */}
             {/* <div className="absolute -left-6 top-0 bottom-0 flex flex-col justify-around text-xs text-white/20 font-mono h-full py-6">
                 <span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
