@@ -65,7 +65,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 case 'STATE_UPDATE':
                     set({
                         gameState: payload.state,
-                        aiValue: payload.aiValue || get().aiValue, // Keep old value if not sent? Or 0? Worker sends 0 by default on non-AI moves
+                        aiValue: payload.aiValue ?? get().aiValue,
                         error: null,
                         isThinking: false // Any state update implies logic done
                     });
@@ -121,7 +121,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     undo: () => {
         if (!worker) return;
-        worker.postMessage({ type: 'UNDO' });
+        const { isThinking, humanPlayer, gameState } = get();
+        
+        // Prevent undo while AI is thinking to avoid state corruption
+        if (isThinking) return;
+
+        let steps = 1;
+
+        // If playing against AI (humanPlayer is 1 or 2, not 0)
+        // We typically want to undo 2 steps to get back to our turn (Undo AI move + Undo our move)
+        // Unless it's Game Over or special case, but usually 2 is safe for "Tyro/Retry" feel.
+        if (humanPlayer !== 0) {
+             // If manual gameplay, we want to undo the opponent's move AND our move
+             // provided enough moves exist.
+             if (gameState.move_count >= 2) {
+                 steps = 2;
+             }
+             // If game is over, logic is tricky.
+             // If AI won, it just moved. We want to undo AI move (1) and Our move (1) -> 2.
+             // If We won, We just moved. 1 step takes us back to our turn.
+             // Let's refine based on winner.
+             if (gameState.game_over && gameState.winner === humanPlayer) {
+                 steps = 1; // Retrieve our winning move
+             }
+        }
+
+        worker.postMessage({ type: 'UNDO', payload: { steps } });
     },
 
     triggerAI: async () => {

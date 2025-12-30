@@ -55,7 +55,10 @@ ctx.onmessage = async (e: MessageEvent) => {
 
             case 'UNDO':
                 if (!module) throw new Error("Module not initialized");
-                module.undo();
+                const steps = payload?.steps || 1;
+                for (let i = 0; i < steps; i++) {
+                    module.undo();
+                }
                 postState();
                 break;
 
